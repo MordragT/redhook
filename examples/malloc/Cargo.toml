@@ -1,0 +1,16 @@
+[package]
+name = "malloc"
+version = "0.1.0"
+authors = ["MordragT <scrat_games@gmx.de>"]
+edition = "2018"
+
+[lib]
+name = "malloc"
+crate_type = ["cdylib"]
+
+[dependencies]
+libc = "0.2.71"
+lazy_static = "1.4.0"
+
+[dependencies.redhook]
+path = "../.."

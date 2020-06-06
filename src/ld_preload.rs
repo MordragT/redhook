@@ -12,8 +12,7 @@ extern "C" {
 pub fn abort_with_message(message: &'static str) -> ! {
     const STDERR_FD: i32 = 2;
     //Rust io may be uninialized yet, so use purest os syscall
-    unsafe
-    {
+    unsafe {
         write(STDERR_FD, message.as_ptr() as *const c_char, message.len());
     }
     std::process::abort()
@@ -40,10 +39,10 @@ macro_rules! hook {
         mod $real_fn {
             use super::*; //required for parameter types
             pub fn get_dlsym_next() -> unsafe extern fn ( $($v : $t),* ) -> $r {
-                use ::std::sync::{Once, ONCE_INIT, atomic::{AtomicUsize, Ordering}};
+                use ::std::sync::{Once, atomic::{AtomicUsize, Ordering}};
 
                 static mut REAL: *const u8 = 0 as *const u8;
-                static mut ONCE: Once = ONCE_INIT;
+                static mut ONCE: Once = Once::new();
 
                 static CALL_ONCE_STACK : AtomicUsize = AtomicUsize::new(0); // Used during call_once to check recursion.
 
@@ -85,6 +84,7 @@ macro_rules! hook {
                 } else {
                     None
                 }.unwrap_or_else(|| get_dlsym_next() ( $($v),* ))
+                //::std::panic::catch_unwind(|| super::$hook_fn ( $($v),* )).unwrap_or_else(|_| get_dlsym_next() ( $($v),* ))
             }
         }
 
